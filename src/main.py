@@ -1,9 +1,9 @@
 import base64
 import logging
+import mimetypes
 import os
 from functools import wraps
 
-import magic
 from dotenv import load_dotenv
 from flask import Flask, request
 from flask_cors import CORS
@@ -66,8 +66,8 @@ def upload_picture():
         image_name = data["name"]
 
         # Check if the file is an image
-        mime_type = magic.from_buffer(image_content, mime=True)
-        if not mime_type.startswith("image/"):
+        mime_type, _ = mimetypes.guess_type(image_name)
+        if not mime_type or not mime_type.startswith("image/"):
             return "Invalid file type. Only images are allowed.", 400
 
         bucket = gcs_client.get_bucket(BUCKET_NAME)
