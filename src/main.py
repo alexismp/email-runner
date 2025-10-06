@@ -6,6 +6,7 @@ from functools import wraps
 import magic
 from dotenv import load_dotenv
 from flask import Flask, request
+from flask_cors import CORS
 from google.cloud import storage
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (
@@ -21,6 +22,7 @@ from sendgrid.helpers.mail import (
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "https://tronify-me-714656958210.us-central1.run.app"}})
 
 PROJECT_ID = os.environ.get("PROJECT_ID")
 BUCKET_NAME = os.environ.get("BUCKET_NAME")

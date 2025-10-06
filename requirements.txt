@@ -5,3 +5,4 @@ sendgrid==6.9.7
 requests==2.31.0
 python-dotenv==1.0.0
 python-magic==0.4.27
+Flask-Cors==4.0.1
