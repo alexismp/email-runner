@@ -3,6 +3,7 @@ import logging
 import os
 from functools import wraps
 
+import magic
 from dotenv import load_dotenv
 from flask import Flask, request
 from google.cloud import storage
@@ -43,7 +44,7 @@ def require_api_key(f):
 
 @app.route("/", methods=["GET"])
 def heartbeat():
-    """Heartbeat endpoint to check if the service is alive."""
+    """Heartbeat endpoint to check if the service is alive.""" 
     return "OK", 200
 
 
@@ -61,6 +62,11 @@ def upload_picture():
         data = request.get_json()
         image_content = base64.b64decode(data["image"])
         image_name = data["name"]
+
+        # Check if the file is an image
+        mime_type = magic.from_buffer(image_content, mime=True)
+        if not mime_type.startswith("image/"):
+            return "Invalid file type. Only images are allowed.", 400
 
         bucket = gcs_client.get_bucket(BUCKET_NAME)
         blob = bucket.blob(image_name)
