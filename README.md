@@ -21,6 +21,17 @@ This project was coded with the assistance of AI Studio, Gemini CLI, and Jules.
 - **Containerized**: Ready for deployment using Docker.
 - **API Key Authentication**: POST endpoints are secured with an API key.
 
+## Technical Details
+
+This service uses the following key libraries and technologies:
+
+- **Flask:** A lightweight WSGI web application framework in Python.
+- **Gunicorn:** A Python WSGI HTTP Server for UNIX.
+- **Google Cloud Storage:** For scalable and secure object storage.
+- **SendGrid:** For reliable email delivery.
+- **mimetypes:** The built-in Python library is used to determine the MIME type of uploaded files based on their filename extension.
+- **Flask-Cors:** To handle Cross-Origin Resource Sharing (CORS) and allow requests from specific origins.
+
 ## API Documentation
 
 ### `GET /`
