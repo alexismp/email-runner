@@ -19,6 +19,7 @@ This project was coded with the assistance of AI Studio, Gemini CLI, and Jules.
 - **Heartbeat**: A simple endpoint to verify that the service is running.
 - **Status Endpoint**: Provides information about the connected Google Cloud Storage bucket, including its URL and the number of images it contains.
 - **Containerized**: Ready for deployment using Docker.
+- **API Key Authentication**: POST endpoints are secured with an API key.
 
 ## API Documentation
 
@@ -29,7 +30,7 @@ A heartbeat endpoint to check if the service is operational.
 - **Method**: `GET`
 - **Success Response**:
   - **Code**: 200 OK
-  - **Content**: `"OK"`
+  - **Content**: "OK"
 
 ---
 
@@ -38,6 +39,8 @@ A heartbeat endpoint to check if the service is operational.
 Uploads an image to the configured Google Cloud Storage bucket.
 
 - **Method**: `POST`
+- **Headers**:
+  - `X-API-KEY`: Your secret API key.
 - **Request Body**:
   ```json
   {
@@ -47,10 +50,11 @@ Uploads an image to the configured Google Cloud Storage bucket.
   ```
 - **Success Response**:
   - **Code**: 201 Created
-  - **Content**: `"Picture uploaded successfully"`
+  - **Content**: "Picture uploaded successfully"
 - **Error Response**:
+  - **Code**: 401 Unauthorized
   - **Code**: 500 Internal Server Error
-  - **Content**: `"Error uploading picture"`
+  - **Content**: "Error uploading picture"
 
 ---
 
@@ -59,6 +63,8 @@ Uploads an image to the configured Google Cloud Storage bucket.
 Sends an email with a specified image from the bucket as an attachment.
 
 - **Method**: `POST`
+- **Headers**:
+  - `X-API-KEY`: Your secret API key.
 - **Request Body**:
   ```json
   {
@@ -68,12 +74,13 @@ Sends an email with a specified image from the bucket as an attachment.
   ```
 - **Success Response**:
   - **Code**: 200 OK
-  - **Content**: `"Email sent successfully"`
+  - **Content**: "Email sent successfully"
 - **Error Responses**:
+  - **Code**: 401 Unauthorized
   - **Code**: 404 Not Found
-    - **Content**: `"Picture not found"`
+    - **Content**: "Picture not found"
   - **Code**: 500 Internal Server Error
-    - **Content**: `"Error sending email"`
+    - **Content**: "Error sending email"
 
 ---
 
@@ -93,7 +100,7 @@ Retrieves the status of the service, including the bucket URL and the number of 
     ```
 - **Error Response**:
   - **Code**: 500 Internal Server Error
-  - **Content**: `"Error getting status"`
+  - **Content**: "Error getting status"
 
 ## Setup and Local Execution
 
@@ -122,6 +129,7 @@ Retrieves the status of the service, including the bucket URL and the number of 
     export BUCKET_NAME="your-gcs-bucket-name"
     export SENDGRID_API_KEY="your-sendgrid-api-key"
     export SENDER_EMAIL="your-sender-email@example.com"
+    export API_KEY="your-secret-api-key"
     ```
 
 4.  **Run the application:**
@@ -129,6 +137,15 @@ Retrieves the status of the service, including the bucket URL and the number of 
     gunicorn --bind 0.0.0.0:8080 main:app --chdir src
     ```
     The service will be available at `http://localhost:8080`.
+
+### Test Client
+
+A test client is provided in `src/test_client.py` to test the `/upload` endpoint.
+
+**Usage:**
+```bash
+python3 src/test_client.py <path/to/your/file>
+```
 
 ## Deployment to Google Cloud Run
 
@@ -169,7 +186,8 @@ Retrieves the status of the service, including the bucket URL and the number of 
       --set-env-vars "PROJECT_ID=$PROJECT_ID" \
       --set-env-vars "BUCKET_NAME=<your-bucket-name>" \
       --set-env-vars "SENDGRID_API_KEY=<your-sendgrid-key>" \
-      --set-env-vars "SENDER_EMAIL=<your-sender-email>"
+      --set-env-vars "SENDER_EMAIL=<your-sender-email>" \
+      --set-env-vars "API_KEY=<your-secret-api-key>"
     ```
 
 After deployment, `gcloud` will provide you with the URL where your service is accessible.

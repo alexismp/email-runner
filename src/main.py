@@ -1,7 +1,9 @@
 import base64
 import logging
 import os
+from functools import wraps
 
+from dotenv import load_dotenv
 from flask import Flask, request
 from google.cloud import storage
 from sendgrid import SendGridAPIClient
@@ -15,15 +17,28 @@ from sendgrid.helpers.mail import (
     Mail,
 )
 
+load_dotenv()
+
 app = Flask(__name__)
 
 PROJECT_ID = os.environ.get("PROJECT_ID")
 BUCKET_NAME = os.environ.get("BUCKET_NAME")
 SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
 SENDER_EMAIL = os.environ.get("SENDER_EMAIL")
+API_KEY = os.environ.get("API_KEY")
 
 gcs_client = storage.Client()
 sendgrid_client = SendGridAPIClient(SENDGRID_API_KEY)
+
+
+def require_api_key(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if request.headers.get("X-API-KEY") != API_KEY:
+            return "Unauthorized", 401
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 
 @app.route("/", methods=["GET"])
@@ -33,6 +48,7 @@ def heartbeat():
 
 
 @app.route("/upload", methods=["POST"])
+@require_api_key
 def upload_picture():
     """
     Handles picture uploads to Google Cloud Storage.
@@ -57,6 +73,7 @@ def upload_picture():
 
 
 @app.route("/email", methods=["POST"])
+@require_api_key
 def email_picture():
     """
     Sends an email with a picture attachment.
