@@ -1,0 +1,7 @@
+[2025-10-06 14:58:44 +0200] [1909] [INFO] Starting gunicorn 20.1.0
+[2025-10-06 14:58:44 +0200] [1909] [INFO] Listening at: http://0.0.0.0:8080 (1909)
+[2025-10-06 14:58:44 +0200] [1909] [INFO] Using worker: sync
+[2025-10-06 14:58:44 +0200] [1911] [INFO] Booting worker with pid: 1911
+[2025-10-06 14:59:06 +0200] [1909] [INFO] Handling signal: term
+[2025-10-06 14:59:06 +0200] [1911] [INFO] Worker exiting (pid: 1911)
+[2025-10-06 14:59:06 +0200] [1909] [INFO] Shutting down: Master

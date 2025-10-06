@@ -1,4 +1,4 @@
 .env
 src/__pycache__/
 venv/
-devoxx-alexis.png
+*.png

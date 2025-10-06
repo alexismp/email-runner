@@ -147,47 +147,33 @@ A test client is provided in `src/test_client.py` to test the `/upload` endpoint
 python3 src/test_client.py <path/to/your/file>
 ```
 
-## Deployment to Google Cloud Run
+## Deployment with Cloud Build
+
+This project includes a `cloudbuild.yaml` file to automate deployments to Google Cloud Run.
 
 ### Prerequisites
 
 - [Google Cloud SDK](https://cloud.google.com/sdk/docs/install) (`gcloud`) installed and configured.
-- [Docker](https://docs.docker.com/get-docker/) installed.
-- A Google Cloud project with the Cloud Run and Cloud Storage APIs enabled.
+- A Google Cloud project with the Cloud Build, Cloud Run, and Cloud Storage APIs enabled.
 - A Google Cloud Storage bucket created.
 - A SendGrid account and API key.
 
+### Permissions
+
+Ensure that the Cloud Build service account has the following roles:
+- **Cloud Build Service Account** (`roles/cloudbuild.builds.builder`)
+- **Cloud Run Admin** (`roles/run.admin`)
+- **Service Account User** (`roles/iam.serviceAccountUser`) on the Cloud Run runtime service account.
+
 ### Steps
 
-1.  **Build the Docker image:**
-    Replace `$PROJECT_ID` with your Google Cloud project ID.
+1.  **Submit the build:**
+    Replace the placeholder values in the command below with your actual configuration. You can also set these as defaults in the `cloudbuild.yaml` file.
     ```bash
-    docker build -t gcr.io/$PROJECT_ID/image-service:v1 .
+    gcloud builds submit --config cloudbuild.yaml --substitutions=_SERVICE_NAME=email-runner,_REGION=us-central1,_BUCKET_NAME=<your-bucket-name>,_SENDGRID_API_KEY=<your-sendgrid-key>,_SENDER_EMAIL=<your-sender-email>,_API_KEY=<your-secret-api-key>
     ```
 
-2.  **Configure Docker to use `gcloud` as a credential helper:**
-    ```bash
-    gcloud auth configure-docker
-    ```
-
-3.  **Push the image to Google Container Registry (GCR):**
-    ```bash
-    docker push gcr.io/$PROJECT_ID/image-service:v1
-    ```
-
-4.  **Deploy to Cloud Run:**
-    Replace the placeholder values with your actual configuration.
-    ```bash
-    gcloud run deploy image-service \
-      --image gcr.io/$PROJECT_ID/image-service:v1 \
-      --platform managed \
-      --region us-central1 \
-      --allow-unauthenticated \
-      --set-env-vars "PROJECT_ID=$PROJECT_ID" \
-      --set-env-vars "BUCKET_NAME=<your-bucket-name>" \
-      --set-env-vars "SENDGRID_API_KEY=<your-sendgrid-key>" \
-      --set-env-vars "SENDER_EMAIL=<your-sender-email>" \
-      --set-env-vars "API_KEY=<your-secret-api-key>"
-    ```
-
-After deployment, `gcloud` will provide you with the URL where your service is accessible.
+This command will trigger a build that:
+1.  Builds the Docker image.
+2.  Pushes the image to Google Container Registry.
+3.  Deploys the new image to your Cloud Run service.
