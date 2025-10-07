@@ -22,7 +22,7 @@ from sendgrid.helpers.mail import (
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "https://tronify-me-714656958210.us-central1.run.app"}})
+CORS(app, resources={r"/*": {"origins": ["https://tronify-me-714656958210.us-central1.run.app", "https://tronify-me-europe-714656958210.europe-west1.run.app"]}})
 
 PROJECT_ID = os.environ.get("PROJECT_ID")
 BUCKET_NAME = os.environ.get("BUCKET_NAME")
